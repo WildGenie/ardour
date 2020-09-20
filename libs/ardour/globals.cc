@@ -539,6 +539,8 @@ ARDOUR::init (bool use_windows_vst, bool try_optimization, const char* localedir
 	if (!PBD::init ())
 		return false;
 
+	Temporal::init ();
+
 #if ENABLE_NLS
 	(void)bindtextdomain (PACKAGE, localedir);
 	(void)bind_textdomain_codeset (PACKAGE, "UTF-8");
