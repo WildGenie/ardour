@@ -2023,7 +2023,7 @@ RegionMoveDrag::finished_no_copy (
 					rv->region()->set_position (where.sample, 0);
 				} else {
 					/* move by music offset */
-					rv->region()->set_position_music (rv->region()->quarter_note() - qn_delta);
+					rv->region()->set_position (rv->region()->quarter_note() - qn_delta);
 				}
 			}
 			_editor->session()->add_command (new StatefulDiffCommand (rv->region()));
@@ -6088,7 +6088,7 @@ NoteDrag::aborted (bool)
 }
 
 /** Make an AutomationRangeDrag for lines in an AutomationTimeAxisView */
-AutomationRangeDrag::AutomationRangeDrag (Editor* editor, AutomationTimeAxisView* atv, list<AudioRange> const & r)
+AutomationRangeDrag::AutomationRangeDrag (Editor* editor, AutomationTimeAxisView* atv, list<TimelineRange> const & r)
 	: Drag (editor, atv->base_item ())
 	, _ranges (r)
 	, _y_origin (atv->y_position())
@@ -6100,7 +6100,7 @@ AutomationRangeDrag::AutomationRangeDrag (Editor* editor, AutomationTimeAxisView
 }
 
 /** Make an AutomationRangeDrag for region gain lines or MIDI controller regions */
-AutomationRangeDrag::AutomationRangeDrag (Editor* editor, list<RegionView*> const & v, list<AudioRange> const & r, double y_origin, double y_height)
+AutomationRangeDrag::AutomationRangeDrag (Editor* editor, list<RegionView*> const & v, list<TimelineRange> const & r, double y_origin, double y_height)
 	: Drag (editor, v.front()->get_canvas_group ())
 	, _ranges (r)
 	, _y_origin (y_origin)
@@ -6148,8 +6148,8 @@ AutomationRangeDrag::setup (list<boost::shared_ptr<AutomationLine> > const & lin
 			r.second = max_samplepos;
 		}
 
-		/* check this range against all the AudioRanges that we are using */
-		list<AudioRange>::const_iterator k = _ranges.begin ();
+		/* check this range against all the TimelineRanges that we are using */
+		list<TimelineRange>::const_iterator k = _ranges.begin ();
 		while (k != _ranges.end()) {
 			if (k->coverage (r.first, r.second) != Evoral::OverlapNone) {
 				break;
@@ -6225,7 +6225,7 @@ AutomationRangeDrag::motion (GdkEvent*, bool first_move)
 		if (!_ranges.empty()) {
 
 			/* add guard points */
-			for (list<AudioRange>::const_iterator i = _ranges.begin(); i != _ranges.end(); ++i) {
+			for (list<TimelineRange>::const_iterator i = _ranges.begin(); i != _ranges.end(); ++i) {
 
 				samplecnt_t const half = (i->start + i->end) / 2;
 
@@ -6305,7 +6305,7 @@ AutomationRangeDrag::motion (GdkEvent*, bool first_move)
 					double const w = i->line->time_converter().to ((*p->model())->when) + i->line->time_converter().origin_b ();
 
 					/* see if it's inside a range */
-					list<AudioRange>::const_iterator k = _ranges.begin ();
+					list<TimelineRange>::const_iterator k = _ranges.begin ();
 					while (k != _ranges.end() && (k->start >= w || k->end <= w)) {
 						++k;
 					}
