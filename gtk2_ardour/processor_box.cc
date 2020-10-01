@@ -997,7 +997,7 @@ ProcessorEntry::Control::start_touch ()
 	if (!c) {
 		return;
 	}
-	c->start_touch (c->session().transport_sample());
+	c->start_touch (timepos_t (c->session().transport_sample()));
 }
 
 void
@@ -1007,7 +1007,7 @@ ProcessorEntry::Control::end_touch ()
 	if (!c) {
 		return;
 	}
-	c->stop_touch (c->session().transport_sample());
+	c->stop_touch (timepos_t (c->session().transport_sample()));
 }
 
 bool
