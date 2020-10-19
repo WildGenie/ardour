@@ -2518,13 +2518,13 @@ MidiRegionView::move_selection(timecnt_t const & dx_qn, double dy, double cumula
 		double dx = 0.0;
 
 		if (midi_view()->note_mode() == Sustained) {
-			dx = editor->time_to_pixel_unrounded ((note_time_qn + dx_qn))
+			dx = editor->time_to_pixel_unrounded (timepos_t (note_time_qn + dx_qn.beats()))
 				- n->item()->item_to_canvas (ArdourCanvas::Duple (n->x0(), 0)).x;
 		} else {
 			/* Hit::x0() is offset by _position.x, unlike Note::x0() */
 			Hit* hit = dynamic_cast<Hit*>(n);
 			if (hit) {
-				dx = editor->time_to_pixel_unrounded ((note_time_qn + dx_qn))
+				dx = editor->time_to_pixel_unrounded (timepos_t (note_time_qn + dx_qn.beats()))
 					- n->item()->item_to_canvas (ArdourCanvas::Duple (((hit->x0() + hit->x1()) / 2.0) - hit->position().x, 0)).x;
 			}
 		}
@@ -2534,7 +2534,7 @@ MidiRegionView::move_selection(timecnt_t const & dx_qn, double dy, double cumula
 		/* update length */
 		if (midi_view()->note_mode() == Sustained) {
 			Note* sus = dynamic_cast<Note*> (*i);
-			double const len_dx = editor->time_to_pixel_unrounded ((note_time_qn + dx_qn + n->note()->length()));
+			double const len_dx = editor->time_to_pixel_unrounded (timepos_t (note_time_qn) + dx_qn + n->note()->length());
 
 			sus->set_x1 (n->item()->canvas_to_item (ArdourCanvas::Duple (len_dx, 0)).x);
 		}
@@ -2602,7 +2602,6 @@ MidiRegionView::move_copies (timecnt_t const & dx_qn, double dy, double cumulati
 {
 	typedef vector<boost::shared_ptr<NoteType> > PossibleChord;
 	Editor* editor = dynamic_cast<Editor*> (&trackview.editor());
-	TempoMap& tmap (editor->session()->tempo_map());
 	PossibleChord to_play;
 	Temporal::Beats earliest = earliest_in_selection();
 
@@ -2612,16 +2611,16 @@ MidiRegionView::move_copies (timecnt_t const & dx_qn, double dy, double cumulati
 			to_play.push_back (n->note());
 		}
 
-		timepos_t const note_time_qn = _region->source_beats_to_absolute_beats (n->note()->time());
-		timecnt_t dx (dx_qn.time_domain());
+		timepos_t const note_time_qn = _region->source_beats_to_absolute_time (n->note()->time());
+		double_t dx = 0;
 
 		if (midi_view()->note_mode() == Sustained) {
-			dx = editor->sample_to_pixel_unrounded (tmap.sample_at_quarter_note (note_time_qn + dx_qn))
+			dx = editor->time_to_pixel_unrounded (timepos_t (note_time_qn) + dx_qn)
 				- n->item()->item_to_canvas (ArdourCanvas::Duple (n->x0(), 0)).x;
 		} else {
 			Hit* hit = dynamic_cast<Hit*>(n);
 			if (hit) {
-				dx = editor->sample_to_pixel_unrounded (tmap.sample_at_quarter_note (note_time_qn + dx_qn))
+				dx = editor->time_to_pixel_unrounded (timepos_t (note_time_qn) + dx_qn)
 					- n->item()->item_to_canvas (ArdourCanvas::Duple (((hit->x0() + hit->x1()) / 2.0) - hit->position().x, 0)).x;
 			}
 		}
@@ -2630,7 +2629,7 @@ MidiRegionView::move_copies (timecnt_t const & dx_qn, double dy, double cumulati
 
 		if (midi_view()->note_mode() == Sustained) {
 			Note* sus = dynamic_cast<Note*> (*i);
-			double const len_dx = editor->sample_to_pixel_unrounded (tmap.sample_at_quarter_note (note_time_qn + dx_qn + n->note()->length()));
+			double const len_dx = editor->time_to_pixel_unrounded (timepos_t (note_time_qn) + dx_qn + n->note()->length());
 
 			sus->set_x1 (n->item()->canvas_to_item (ArdourCanvas::Duple (len_dx, 0)).x);
 		}
@@ -2694,7 +2693,7 @@ MidiRegionView::note_dropped(NoteBase *, timecnt_t const & d_qn, int8_t dnote, b
 
 		for (Selection::iterator i = _selection.begin(); i != _selection.end() ; ++i) {
 
-			Temporal::Beats new_time = Temporal::Beats ((*i)->note()->time() + d_qn);
+			Temporal::Beats new_time = (*i)->note()->time() + d_qn.beats ();
 
 			if (new_time < Temporal::Beats()) {
 				continue;
@@ -2733,7 +2732,7 @@ MidiRegionView::note_dropped(NoteBase *, timecnt_t const & d_qn, int8_t dnote, b
 		for (CopyDragEvents::iterator i = _copy_drag_events.begin(); i != _copy_drag_events.end() ; ++i) {
 
 			/* update time */
-			Temporal::Beats new_time = (*i)->note()->time() + d_qn;
+			Temporal::Beats new_time = (*i)->note()->time() + d_qn.beats();
 
 			if (new_time < Temporal::Beats()) {
 				continue;
@@ -2957,7 +2956,7 @@ MidiRegionView::update_resizing (NoteBase* primary, bool at_front, double delta_
 
 			cursor_set = true;
 
-			trackview.editor().set_snapped_cursor_position ((snapped_x + midi_region()->nt_position()).samples());
+			trackview.editor().set_snapped_cursor_position (snapped_x + midi_region()->nt_position());
 		}
 
 	}
@@ -2971,7 +2970,6 @@ void
 MidiRegionView::commit_resizing (NoteBase* primary, bool at_front, double delta_x, bool relative, double snap_delta, bool with_snap)
 {
 	_note_diff_command = _model->new_note_diff_command (_("resize notes"));
-	TempoMap& tmap (trackview.session()->tempo_map());
 
 	/* XX why doesn't snap_pixel_to_sample() handle this properly? */
 	bool const ensure_snap = trackview.editor().snap_mode () != SnapMagnetic;
