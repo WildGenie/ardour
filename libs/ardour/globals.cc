@@ -524,6 +524,8 @@ ARDOUR::init (bool use_windows_vst, bool try_optimization, const char* localedir
 		return true;
 	}
 
+	Temporal::set_sample_rate_callback (AudioEngine::static_sample_rate);
+
 	running_from_gui = with_gui;
 
 #ifndef NDEBUG
