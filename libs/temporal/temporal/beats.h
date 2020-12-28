@@ -294,6 +294,7 @@ class DoubleableBeats : public Beats
 	double to_double() const { return (double)_beats + (_ticks / (double)PPQN); }
 };
 
+
 /*
   TIL, several horrible hours later, that sometimes the compiler looks in the
   namespace of a type (Temporal::Beats in this case) for an operator, and
@@ -308,12 +309,6 @@ std::ostream& operator<<(std::ostream& ostream, const Temporal::Beats& t);
 std::istream& operator>>(std::istream& istream, Temporal::Beats& b);
 
 } // namespace Temporal
-
-namespace PBD {
-	namespace DEBUG {
-		LIBTEMPORAL_API extern uint64_t Beats;
-	}
-}
 
 namespace std {
 	template<>
@@ -330,12 +325,10 @@ namespace std {
 			return Temporal::Beats(std::numeric_limits<int32_t>::max(), Temporal::Beats::PPQN-1);
 		}
 	};
+
 }
 
 namespace PBD {
-	namespace DEBUG {
-		LIBTEMPORAL_API extern uint64_t Beats;
-	}
 
 template<>
 inline bool to_string (Temporal::Beats val, std::string & str)
