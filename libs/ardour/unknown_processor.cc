@@ -27,7 +27,7 @@ using namespace std;
 using namespace ARDOUR;
 
 UnknownProcessor::UnknownProcessor (Session& s, XMLNode const & state)
-	: Processor (s, "")
+	: Processor (s, "", Temporal::AudioTime)
 	, _state (state)
 	, have_ioconfig (false)
 	, saved_input (0)

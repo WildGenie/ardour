@@ -183,7 +183,7 @@ Route::init ()
 	/* panning */
 
 	if (!(_presentation_info.flags() & PresentationInfo::MonitorOut)) {
-		_pannable.reset (new Pannable (_session));
+		_pannable.reset (new Pannable (_session, Config->get_default_automation_time_domain()));
 	}
 
 	/* input and output objects */
@@ -957,7 +957,7 @@ Route::add_processor_from_xml_2X (const XMLNode& node, int version)
 
 		} else if (node.name() == "Send") {
 
-			boost::shared_ptr<Pannable> sendpan (new Pannable (_session));
+			boost::shared_ptr<Pannable> sendpan (new Pannable (_session, Config->get_default_automation_time_domain()));
 			processor.reset (new Send (_session, sendpan, _mute_master));
 
 		} else {
