@@ -4180,7 +4180,7 @@ CursorDrag::start_grab (GdkEvent* event, Gdk::Cursor* c)
 {
 	Drag::start_grab (event, c);
 
-	setup_snap_delta (timepos_t (_editor->playhead_cursor->current_sample()));
+	setup_snap_delta (timepos_t (_editor->playhead_cursor()->current_sample()));
 
 	_grab_zoom = _editor->samples_per_pixel;
 
@@ -4307,7 +4307,7 @@ CursorDrag::aborted (bool)
 		_editor->_dragging_playhead = false;
 	}
 
-	_editor->playhead_cursor->set_position (adjusted_time (grab_time (), 0, false).samples());
+	_editor->playhead_cursor()->set_position (adjusted_time (grab_time (), 0, false).samples());
 }
 
 FadeInDrag::FadeInDrag (Editor* e, ArdourCanvas::Item* i, RegionView* p, list<RegionView*> const & v)
