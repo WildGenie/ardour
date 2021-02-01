@@ -3369,6 +3369,7 @@ TrimDrag::setup_pointer_offset ()
 		return;
 	}
 
+
 	switch (_operation) {
 	case StartTrim:
 		_pointer_offset = i->initial_position.distance (raw_grab_time());
