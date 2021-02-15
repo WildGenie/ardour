@@ -497,7 +497,7 @@ RegionView::reset_width_dependent_items (double pixel_width)
 	_pixel_width = pixel_width;
 
 	if (_xrun_markers_visible) {
-		const samplepos_t start = _region->start();
+		const samplepos_t start = _region->start_sample();
 		for (list<std::pair<samplepos_t, ArdourCanvas::Arrow*> >::iterator i = _xrun_markers.begin(); i != _xrun_markers.end(); ++i) {
 			float x_pos = trackview.editor().sample_to_pixel (i->first - start);
 			i->second->set_x (x_pos);
@@ -513,8 +513,8 @@ RegionView::update_xrun_markers ()
 		return;
 	}
 
-	const samplepos_t start = _region->start();
-	const samplepos_t length = _region->length();
+	const samplepos_t start = _region->start_sample();
+	const samplepos_t length = _region->length_samples();
 	for (list<std::pair<samplepos_t, ArdourCanvas::Arrow*> >::iterator i = _xrun_markers.begin(); i != _xrun_markers.end(); ++i) {
 		float x_pos = trackview.editor().sample_to_pixel (i->first - start);
 		i->second->set_x (x_pos);
