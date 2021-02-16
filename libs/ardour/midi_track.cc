@@ -40,7 +40,6 @@
 #include "evoral/midi_util.h"
 
 #include "ardour/amp.h"
-#include "ardour/beats_samples_converter.h"
 #include "ardour/buffer_set.h"
 #include "ardour/debug.h"
 #include "ardour/delivery.h"
