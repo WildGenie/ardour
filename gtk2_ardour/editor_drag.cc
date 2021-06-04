@@ -1817,6 +1817,7 @@ RegionMoveDrag::finished_copy (bool const changed_position, bool const changed_t
 
 			if (new_view != 0) {
 				new_views.push_back (new_view);
+				ripple_exclude.push_back (new_view->region());
 			}
 		}
 	}
