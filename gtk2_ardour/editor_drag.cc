@@ -1517,6 +1517,7 @@ RegionMoveDrag::motion (GdkEvent* event, bool first_move)
 		} else {
 			_editor->begin_reversible_command (Operations::region_copy);
 		}
+
 		/* duplicate the regionview(s) and region(s) */
 
 		list<DraggingView> new_regionviews;
