@@ -1698,7 +1698,8 @@ RegionMoveDrag::clear_draggingview_list ()
 	_views.clear();
 }
 
-RegionMoveDrag::finished_copy (bool const changed_position, bool const /*changed_tracks*/, timepos_t const & last_position, int32_t const ev_state)
+void
+RegionMoveDrag::finished_copy (bool const changed_position, bool const changed_tracks, timepos_t const & last_position, int32_t const ev_state)
 {
 	RegionSelection new_views;
 	PlaylistSet modified_playlists;
