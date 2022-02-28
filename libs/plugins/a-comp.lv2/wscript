@@ -27,7 +27,7 @@ def build(bld):
     # Build RDF files
     for i in ['manifest.ttl', 'a-comp.ttl', 'a-comp#stereo.ttl', 'presets.ttl']:
         obj = bld(features='subst')
-        obj.source = i + '.in'
+        obj.source = f'{i}.in'
         obj.target = '../../LV2/%s/%s' % (bundle, i)
         obj.install_path = '${LV2DIR}/%s' % bundle
         obj.chmod = Utils.O644

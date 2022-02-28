@@ -159,8 +159,7 @@ class command_output(Task.Task):
 			else:
 				return template % node.abspath()
 		def output_path(node, template):
-			fun = node.abspath
-			if task.cwd is None: fun = node.bldpath
+			fun = node.bldpath if task.cwd is None else node.abspath
 			return template % fun()
 
 		if isinstance(task.command, Node.Node):

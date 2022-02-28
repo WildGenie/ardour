@@ -31,7 +31,10 @@ def build(bld):
     obj.use      = 'libardour libpbd'
     obj.uselib   = 'GLIBMM XML OSX'
     obj.framework = [ 'CoreAudio', 'AudioToolbox', 'CoreServices' ]
-    if bld.env['build_target'] not in [ 'lion', 'el_capitan' ] and (not bld.env['build_arch'] == "ppc"):
+    if (
+        bld.env['build_target'] not in ['lion', 'el_capitan']
+        and bld.env['build_arch'] != "ppc"
+    ):
         obj.framework += [ 'CoreMidi' ]
     else:
         obj.framework += [ 'CoreMIDI' ]
@@ -43,6 +46,8 @@ def build(bld):
 
     # use new coreaudio API (the old one was deprecated in 10.6, yet still works)
     # only use with OSX intel 10.6 or later, but for all OSX/PPC (<= 10.6)
-    if not bld.env['build_target'] in ['panther', 'tiger', 'leopard']:
-        if not (bld.env['build_target'] == 'snowleopard' and bld.env['build_arch'] == "ppc"):
-            obj.defines += ['COREAUDIO_108']
+    if bld.env['build_target'] not in ['panther', 'tiger', 'leopard'] and (
+        bld.env['build_target'] != 'snowleopard'
+        or bld.env['build_arch'] != "ppc"
+    ):
+        obj.defines += ['COREAUDIO_108']

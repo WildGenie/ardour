@@ -39,11 +39,11 @@ def build(bld):
         obj.export_includes = ['CoreAudio105']
         obj.source += ' CoreAudio105/CAAudioFile.cpp';
         for src in libappleutility_sources:
-            obj.source += ' CoreAudio105/' + src;
+            obj.source += f' CoreAudio105/{src}';
     else:
         obj.export_includes = ['CoreAudio/PublicUtility']
         for src in libappleutility_sources:
-            obj.source += ' CoreAudio/PublicUtility/' + src;
+            obj.source += f' CoreAudio/PublicUtility/{src}';
 
     # apple did not write this library with full symbol export control
     # so we need to override any visibility default.

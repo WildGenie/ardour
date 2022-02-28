@@ -52,8 +52,11 @@ def build(bld):
         'LOCALEDIR="' + os.path.join(os.path.normpath(bld.env['DATADIR']), 'locale') + '"',
         ]
     obj.install_path = bld.env['LIBDIR']
-    obj.uselib       = 'UUID FLAC FONTCONFIG GLIBMM GIOMM GTHREAD OGG CURL DL XML'
-    obj.uselib       += ' AUDIOUNITS OSX'
+    obj.uselib = (
+        'UUID FLAC FONTCONFIG GLIBMM GIOMM GTHREAD OGG CURL DL XML'
+        + ' AUDIOUNITS OSX'
+    )
+
     obj.uselib       += ' FFTW3F LO TAGLIB LILV RUBBERBAND AUBIO LRDF ARCHIVE VAMPSDK VAMPHOSTSDK'
 
     if bld.is_defined('HAVE_SUIL'):
@@ -64,9 +67,8 @@ def build(bld):
         obj.use    += ' libappleutility'
     obj.includes += ['../libs']
 
-    if bld.env['build_target'] == 'mingw':
-        if bld.env['DEBUG'] == False:
-            obj.linkflags = ['-mwindows']
+    if bld.env['build_target'] == 'mingw' and bld.env['DEBUG'] == False:
+        obj.linkflags = ['-mwindows']
 
     if bld.is_defined('NEED_INTL'):
         obj.linkflags = ' -lintl'

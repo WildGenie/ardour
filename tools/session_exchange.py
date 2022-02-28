@@ -42,38 +42,33 @@ def get_header_size(filename):
                         return None
 
 def append_empty_data(self, filename, size):
-        file = open(filename, 'a')
-        file.seek(size-1)
-        file.write('\x00')
-        file.close()
+        with open(filename, 'a') as file:
+                file.seek(size-1)
+                file.write('\x00')
         
 def get_sound_list(snapshot):
         doc = xml.dom.minidom.parse(snapshot)
-        
-        regionlist = []
+
         playlists_tag = doc.getElementsByTagName('Playlists')
         playlists = playlists_tag[0].getElementsByTagName('Playlist')
+        regionlist = []
         for play in playlists:
                 regions = play.getElementsByTagName('Region')
                 for region in regions:
-                        regionlist.append(region.getAttribute('source-0'))
-                        regionlist.append(region.getAttribute('source-1'))
-                        regionlist.append(region.getAttribute('source-2'))
-                        regionlist.append(region.getAttribute('source-3'))
-                        regionlist.append(region.getAttribute('source-4'))
-                        regionlist.append(region.getAttribute('source-5'))
-        
-        sourcelist = {}
+                        regionlist.extend((
+                            region.getAttribute('source-0'),
+                            region.getAttribute('source-1'),
+                            region.getAttribute('source-2'),
+                            region.getAttribute('source-3'),
+                            region.getAttribute('source-4'),
+                            region.getAttribute('source-5'),
+                        ))
         sources = doc.getElementsByTagName('Source')
-        for source in sources:
-                sourcelist[source.getAttribute('id')] = str(source.getAttribute('name'))
-
-        soundlist = []
-        for id in regionlist:
-                if sourcelist.has_key(id):
-                        soundlist.append(sourcelist[id])
-        
-        return soundlist
+        sourcelist = {
+            source.getAttribute('id'): str(source.getAttribute('name'))
+            for source in sources
+        }
+        return [sourcelist[id] for id in regionlist if sourcelist.has_key(id)]
 
 def raise_error(string, parent):
         dialog = gtk.MessageDialog(parent, gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
@@ -108,38 +103,38 @@ class Data(object):
         
         def add_collab(self, session_name, collab_name, ip_address, port):
                 sessions = self._data['sessions']
-                sessions[session_name]['collabs'][collab_name] = {}
-                sessions[session_name]['collabs'][collab_name]['snaps'] = []
-                sessions[session_name]['collabs'][collab_name]['sounds'] = []
+                sessions[session_name]['collabs'][collab_name] = {'snaps': [], 'sounds': []}
                 sessions[session_name]['collabs'][collab_name]['ip'] = ip_address
                 sessions[session_name]['collabs'][collab_name]['port'] = port
                 sessions[session_name]['collabs'][collab_name]['v2paths'] = True
                 self._data['sessions'] = sessions
-                
+
                 client = ExchangeClientFactory(session_name, collab_name, None, self.debug_mode)
                 reactor.connectTCP(ip_address, port, client)
                 g_display.show_status("connecting")
-                
+
                 g_display.update_collab_view()
         
         def add_session(self, session_path):
                 sessions = self._data['sessions']
-                
+
                 session_name = session_path[session_path.rfind('/', 0, len(session_path)-2)+1: -1]
                 sessions[session_name] = {}
-                sessions[session_name]['path'] = session_path 
-                sessions[session_name]['collabs'] = {}
-                sessions[session_name]['collabs'][self._data['user']] = {}
-                sessions[session_name]['collabs'][self._data['user']]['snaps'] = []
-                sessions[session_name]['collabs'][self._data['user']]['sounds'] = []
+                sessions[session_name]['path'] = session_path
+                sessions[session_name]['collabs'] = {
+                    self._data['user']: {
+                        'snaps': [],
+                        'sounds': []
+                    }
+                }
                 if os.path.isdir (os.path.join (session_path,'sounds')):
                         sessions[session_name]['collabs'][self._data['user']]['v2paths'] = False
                         v2paths = False
                 else:
                         sessions[session_name]['collabs'][self._data['user']]['v2paths'] = True
-                
+
                 self._data['sessions'] = sessions
-                
+
                 self.rescan_session(session_name)
 
         def rescan_session(self, session_name):
@@ -486,7 +481,7 @@ class ExchangeClientFactory(protocol.ClientFactory):
                 return ExchangeClient(self.session_name, self.collab_name, self.snap_name, self.debug_mode)
         
         def clientConnectionFailed(self, connector, reason):
-                raise_error('Connection failed: ' + reason.getErrorMessage(), g_display.window)
+                raise_error(f'Connection failed: {reason.getErrorMessage()}', g_display.window)
                 g_display.show_status('Connection failed')
         
         def __init__(self, session_name, collab_name, snap_name, debug_mode):
@@ -631,7 +626,7 @@ class ArdourShareWindow(object):
         def add_session_ok_file_btn_clicked(self, w):
                 filename = self.file_sel.get_filename()
                 if filename.endswith(".ardour"):
-                        g_data.add_session(filename[0:filename.rfind("/")+1])
+                        g_data.add_session(filename[:filename.rfind("/")+1])
                         self.update_session_view()
                 else:
                         raise_error("Not an Ardour session", self.window)

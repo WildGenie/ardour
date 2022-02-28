@@ -62,8 +62,11 @@ def build(bld):
         'PACKAGE="'    + "ARDOURUTILS" + '"',
         ]
 
-    obj.uselib       = 'UUID FLAC FONTCONFIG GLIBMM GIOMM GTHREAD OGG CURL DL XML'
-    obj.uselib       += ' AUDIOUNITS OSX LO '
+    obj.uselib = (
+        'UUID FLAC FONTCONFIG GLIBMM GIOMM GTHREAD OGG CURL DL XML'
+        + ' AUDIOUNITS OSX LO '
+    )
+
     obj.uselib       += ' READLINE '
     obj.uselib       += ' FFTW3F LO TAGLIB LILV RUBBERBAND AUBIO LRDF ARCHIVE VAMPSDK VAMPHOSTSDK'
 

@@ -317,202 +317,193 @@ gtk2_ardour_sources = [
         'export_video_infobox.cc'
 ]
 
-def enoify (major, minor):
-    # Code names based on
-    # https://en.wikipedia.org/wiki/Brian_Eno_discography
-    #
-    # sort Studio albums + Collaborative albums + Compilation albums by Month/Year.
-    # (no Singles, no EPs, no Video Albums, no Production)
-    if major == 3:
-        return "\\n\\\"E-No\\\""
-    elif major == 4:
-        if minor == 0:
-            return "\\n\\\"No Pussyfooting\\\""
-        elif minor == 1:
-            return "\\n\\\"Here Come the Warm Jets\\\""
-        elif minor == 2:
-            return "\\n\\\"Taking Tiger Mountain\\\""
-        elif minor == 3:
-            return "\\n\\\"Lady June's Linguistic Leprosy\\\""
-        elif minor == 4:
-            return "\\n\\\"Discreet Music\\\""
-        elif minor == 5:
-            return "\\n\\\"Another Green World\\\""
-        elif minor == 6:
-            return "\\n\\\"Evening Star\\\""
-        elif minor == 7:
-            return "\\n\\\"Cluster and Eno\\\""
-    elif major == 5:
-        if minor == 0:
-            return "\\n\\\"Before and After Science\\\""
-        elif minor == 1:
-            return "\\n\\\"After the Heat\\\""
-        elif minor == 2:
-            return "\\n\\\"Music for Airports\\\""
-        elif minor == 3:
-            return "\\n\\\"Music for Films\\\""
-        elif minor == 4:
-            return "\\n\\\"In a Land of Clear Colours\\\""
-        elif minor == 5:
-            return "\\n\\\"The Plateaux of Mirror\\\""
-        elif minor == 6:
-            return "\\n\\\"Possible Musics\\\"" # 1980 Collaborative
-        elif minor == 7:
-            return "\\n\\\"My Life in the Bush of Ghosts\\\"" # 1981
-        elif minor == 8:
-            return "\\n\\\"Music for Airplay\\\"" # 1981 Compilation
-        elif minor == 9:
-            return "\\n\\\"On Land\\\"" # 1982
-        elif minor == 10:
-            return "\\n\\\"Atmospheres and Soundtracks\\\"" # 1983
-        elif minor == 11:
-            return "\\n\\\"More Music for Films\\\"" # 1983
-        elif minor == 12:
-            return "\\n\\\"Working Backwards\\\"" # 1984 Compilation
-    elif major == 6:
-        if minor == 0:
-            return "\\n\\\"The Pearl\\\"" # 1984 Collaborative
-        elif minor == 1:
-            return "\\n\\\"Begegnungen\\\"" # 1984 Compilation
-        elif minor == 2:
-            return "\\n\\\"Thursday Afternoon\\\"" # 1985
-        elif minor == 3:
-            return "\\n\\\"Hybrid\\\"" # 1985 Collaborative
-        elif minor == 4 or minor == 5: # (there was on 6.4 release)
-            return "\\n\\\"Old Land\\\"" # 1985 Compilation
-        elif minor == 6 or minor == 7: # still on the desert island
-            return "\\n\\\"Desert Island Selection\\\"" # 1986 Compilation
-        elif minor == 8:
-            return "\\n\\\"After Bach\\\"" # the odd one out
-    elif major == 7:
-        if minor == 0:
-            return "\\n\\\"More Blank Than Frank\\\"" # 1986 Compilation
-        if minor == 1:
-            return "\\n\\\"Music for Films III\\\"" # 1988 Collaborative
-        if minor == 2:
-            return "\\n\\\"Wrong Way Up\\\"" # 1990 Collaborative
-        if minor == 3:
-            return "\\n\\\"Nerve Net\\\"" # 1992
-        if minor == 4:
-            return "\\n\\\"The Shutov Assembly\\\"" # 1992
-        if minor == 5:
-            return "\\n\\\"Neroli\\\"" # 1993
-    return "\\\"\\\""
+def enoify(major, minor):
+	    # Code names based on
+	    # https://en.wikipedia.org/wiki/Brian_Eno_discography
+	    #
+	    # sort Studio albums + Collaborative albums + Compilation albums by Month/Year.
+	    # (no Singles, no EPs, no Video Albums, no Production)
+	if major == 3:
+		return "\\n\\\"E-No\\\""
+	elif major == 4:
+		if minor == 0:
+		    return "\\n\\\"No Pussyfooting\\\""
+		elif minor == 1:
+		    return "\\n\\\"Here Come the Warm Jets\\\""
+		elif minor == 2:
+		    return "\\n\\\"Taking Tiger Mountain\\\""
+		elif minor == 3:
+		    return "\\n\\\"Lady June's Linguistic Leprosy\\\""
+		elif minor == 4:
+		    return "\\n\\\"Discreet Music\\\""
+		elif minor == 5:
+		    return "\\n\\\"Another Green World\\\""
+		elif minor == 6:
+		    return "\\n\\\"Evening Star\\\""
+		elif minor == 7:
+		    return "\\n\\\"Cluster and Eno\\\""
+	elif major == 5:
+		if minor == 0:
+			return "\\n\\\"Before and After Science\\\""
+		elif minor == 1:
+			return "\\n\\\"After the Heat\\\""
+		elif minor == 10:
+			return "\\n\\\"Atmospheres and Soundtracks\\\"" # 1983
+		elif minor == 11:
+			return "\\n\\\"More Music for Films\\\"" # 1983
+		elif minor == 12:
+			return "\\n\\\"Working Backwards\\\"" # 1984 Compilation
+		elif minor == 2:
+			return "\\n\\\"Music for Airports\\\""
+		elif minor == 3:
+			return "\\n\\\"Music for Films\\\""
+		elif minor == 4:
+			return "\\n\\\"In a Land of Clear Colours\\\""
+		elif minor == 5:
+			return "\\n\\\"The Plateaux of Mirror\\\""
+		elif minor == 6:
+			return "\\n\\\"Possible Musics\\\"" # 1980 Collaborative
+		elif minor == 7:
+			return "\\n\\\"My Life in the Bush of Ghosts\\\"" # 1981
+		elif minor == 8:
+			return "\\n\\\"Music for Airplay\\\"" # 1981 Compilation
+		elif minor == 9:
+			return "\\n\\\"On Land\\\"" # 1982
+	elif major == 6:
+		if minor == 0:
+			return "\\n\\\"The Pearl\\\"" # 1984 Collaborative
+		elif minor == 1:
+		    return "\\n\\\"Begegnungen\\\"" # 1984 Compilation
+		elif minor == 2:
+		    return "\\n\\\"Thursday Afternoon\\\"" # 1985
+		elif minor == 3:
+		    return "\\n\\\"Hybrid\\\"" # 1985 Collaborative
+		elif minor in [4, 5]: # (there was on 6.4 release)
+			return "\\n\\\"Old Land\\\"" # 1985 Compilation
+		elif minor in [6, 7]: # still on the desert island
+			return "\\n\\\"Desert Island Selection\\\"" # 1986 Compilation
+		elif minor == 8:
+		    return "\\n\\\"After Bach\\\"" # the odd one out
+	elif major == 7:
+		if minor == 0:
+		    return "\\n\\\"More Blank Than Frank\\\"" # 1986 Compilation
+		if minor == 1:
+		    return "\\n\\\"Music for Films III\\\"" # 1988 Collaborative
+		if minor == 2:
+		    return "\\n\\\"Wrong Way Up\\\"" # 1990 Collaborative
+		if minor == 3:
+		    return "\\n\\\"Nerve Net\\\"" # 1992
+		if minor == 4:
+		    return "\\n\\\"The Shutov Assembly\\\"" # 1992
+		if minor == 5:
+		    return "\\n\\\"Neroli\\\"" # 1993
+	return "\\\"\\\""
 
 def options(opt):
     autowaf.set_options(opt)
 
 def configure(conf):
-    conf.load('misc')
-    conf.load('compiler_cxx')
-    autowaf.configure(conf)
+	conf.load('misc')
+	conf.load('compiler_cxx')
+	autowaf.configure(conf)
 
-    # TODO: Insert a sanity check for on OS X to ensure CoreAudio is present
+	# TODO: Insert a sanity check for on OS X to ensure CoreAudio is present
 
-    autowaf.check_pkg(conf, 'fftw3f', uselib_store='FFTW3F',
-                      mandatory=True)
-    autowaf.check_pkg(conf, 'flac', uselib_store='FLAC',
-                      atleast_version='1.2.1')
-    autowaf.check_pkg(conf, 'gthread-2.0', uselib_store='GTHREAD',
-                      atleast_version='2.10.1')
-    autowaf.check_pkg(conf, 'gtk+-2.0', uselib_store='GTK',
-                      atleast_version='2.18')
-    autowaf.check_pkg(conf, 'gtkmm-2.4', uselib_store='GTKMM',
-                      atleast_version='2.18')
-    autowaf.check_pkg(conf, 'ogg', uselib_store='OGG', atleast_version='1.1.2')
-    autowaf.check_pkg(conf, 'x11', uselib_store='X11', atleast_version='1.1', mandatory=False)
-    autowaf.check_pkg(conf, 'pangoft2', uselib_store='PANGOFT2', atleast_version='1.36.8', mandatory=False)
-    autowaf.check_pkg(conf, 'fontconfig', uselib_store='FONTCONFIG')
+	autowaf.check_pkg(conf, 'fftw3f', uselib_store='FFTW3F',
+	                  mandatory=True)
+	autowaf.check_pkg(conf, 'flac', uselib_store='FLAC',
+	                  atleast_version='1.2.1')
+	autowaf.check_pkg(conf, 'gthread-2.0', uselib_store='GTHREAD',
+	                  atleast_version='2.10.1')
+	autowaf.check_pkg(conf, 'gtk+-2.0', uselib_store='GTK',
+	                  atleast_version='2.18')
+	autowaf.check_pkg(conf, 'gtkmm-2.4', uselib_store='GTKMM',
+	                  atleast_version='2.18')
+	autowaf.check_pkg(conf, 'ogg', uselib_store='OGG', atleast_version='1.1.2')
+	autowaf.check_pkg(conf, 'x11', uselib_store='X11', atleast_version='1.1', mandatory=False)
+	autowaf.check_pkg(conf, 'pangoft2', uselib_store='PANGOFT2', atleast_version='1.36.8', mandatory=False)
+	autowaf.check_pkg(conf, 'fontconfig', uselib_store='FONTCONFIG')
 
-    if conf.env.CC_NAME == 'gcc' and Options.options.strict:
-        conf.define('GLIB_DISABLE_DEPRECATION_WARNINGS', 1)
-        for var in ['CFLAGS', 'CXXFLAGS']:
-            for lib in ['GTK', 'GTKMM']:
-                for d in conf.env['INCLUDES_' + lib]:
-                    conf.env.append_value(var, ['-isystem', d])
+	if conf.env.CC_NAME == 'gcc' and Options.options.strict:
+		conf.define('GLIB_DISABLE_DEPRECATION_WARNINGS', 1)
+		for var in ['CFLAGS', 'CXXFLAGS']:
+			for lib in ['GTK', 'GTKMM']:
+				for d in conf.env[f'INCLUDES_{lib}']:
+					conf.env.append_value(var, ['-isystem', d])
 
-    if sys.platform == 'darwin':
-        conf.check(
-                msg              ='Checking for Cocoa live resizing constants',
-                fragment         = '#include <AppKit/NSWindow.h>\n int main(void) { (void) NSWindowWillStartLiveResizeNotification; return 0; }\n',
-                define_name      = 'HAVE_COCOA_LIVE_RESIZING',
-                uselib_store     = 'COCOA_LIVE_RESIZING',
-                compiler         = 'cc',
-                compile_filename = 'test.m',
-                execute          = True,
-                mandatory        = False)
+	if sys.platform == 'darwin':
+	    conf.check(
+	            msg              ='Checking for Cocoa live resizing constants',
+	            fragment         = '#include <AppKit/NSWindow.h>\n int main(void) { (void) NSWindowWillStartLiveResizeNotification; return 0; }\n',
+	            define_name      = 'HAVE_COCOA_LIVE_RESIZING',
+	            uselib_store     = 'COCOA_LIVE_RESIZING',
+	            compiler         = 'cc',
+	            compile_filename = 'test.m',
+	            execute          = True,
+	            mandatory        = False)
 
-    conf.write_config_header('gtk2ardour-config.h', remove=False)
+	conf.write_config_header('gtk2ardour-config.h', remove=False)
 
-    bak = conf.env['define_key']
-    conf.define('VERSIONSTRING', str (conf.env['VERSION']))
-    conf.define('CODENAME', enoify(int(conf.env['MAJOR']), int(conf.env['MINOR'])))
-    conf.env['define_key'] = ['VERSIONSTRING', 'CODENAME' ]
-    conf.write_config_header('gtk2ardour-version.h')
-    conf.env['define_key'] = bak;
+	bak = conf.env['define_key']
+	conf.define('VERSIONSTRING', str (conf.env['VERSION']))
+	conf.define('CODENAME', enoify(int(conf.env['MAJOR']), int(conf.env['MINOR'])))
+	conf.env['define_key'] = ['VERSIONSTRING', 'CODENAME' ]
+	conf.write_config_header('gtk2ardour-version.h')
+	conf.env['define_key'] = bak;
 
-    # Boost headers
-    autowaf.check_header(conf, 'cxx', 'boost/shared_ptr.hpp')
-    autowaf.check_header(conf, 'cxx', 'boost/weak_ptr.hpp')
+	# Boost headers
+	autowaf.check_header(conf, 'cxx', 'boost/shared_ptr.hpp')
+	autowaf.check_header(conf, 'cxx', 'boost/weak_ptr.hpp')
 
 def _doPyp(infileName, deps = False):
-    outStr = ''
-    out = []
-    re_spaces = re.compile("\s+")
+	outStr = ''
+	out = []
+	re_spaces = re.compile("\s+")
 
-    if infileName == '-':
-        fd = sys.stdin
-    else:
-        fd = open(infileName)
-    inLines = fd.readlines()
-    if fd != sys.stdin:
-        fd.close()
+	fd = sys.stdin if infileName == '-' else open(infileName)
+	inLines = fd.readlines()
+	if fd != sys.stdin:
+	    fd.close()
 
 
-    for line in inLines:
-        bits = re_spaces.split(line)
-        if bits[0] == '##include':
-            incName = bits[1]
-            if (deps):
-                out += [ incName ]
-            else:
-                # assume included file comes from same place as source file
-                incName = os.path.join (os.path.dirname (infileName), incName);
-                outStr += _doPyp(incName)
-        else:
-            if not deps:
-                outStr += line
+	for line in inLines:
+		bits = re_spaces.split(line)
+		if bits[0] == '##include':
+			incName = bits[1]
+			if (deps):
+			    out += [ incName ]
+			else:
+			    # assume included file comes from same place as source file
+			    incName = os.path.join (os.path.dirname (infileName), incName);
+			    outStr += _doPyp(incName)
+		elif not deps:
+			outStr += line
 
-    # done
-    if deps:
-        return out
-    else:
-        return outStr
+	    # done
+	return out if deps else outStr
 
 def include_processor(task):
-    infileName = task.inputs[0].srcpath()
-    outfileName = os.path.join(out, task.outputs[0].bldpath())
-    fdOut = open (outfileName, "w")
-    fdOut.write (_doPyp(infileName))
-    fdOut.close ()
+	infileName = task.inputs[0].srcpath()
+	outfileName = os.path.join(out, task.outputs[0].bldpath())
+	with open (outfileName, "w") as fdOut:
+		fdOut.write (_doPyp(infileName))
 
 
 def build_color_scheme(path, prefix):
-    f = open (path, 'r')
-    color_scheme = ''
-    for line in f:
-        if re.search ('^#@color', line):
-            line.strip() # remove newline
-            words = line.split()
-            if len(color_scheme):
-                color_scheme += ';'
-            color_scheme += prefix
-            color_scheme += '_'
-            color_scheme += words[1]
-            color_scheme += ':'
-            color_scheme += words[2]
-    f.close()
-    return color_scheme
+	with open (path, 'r') as f:
+		color_scheme = ''
+		for line in f:
+		    if re.search ('^#@color', line):
+		        line.strip() # remove newline
+		        words = line.split()
+		        if len(color_scheme):
+		            color_scheme += ';'
+		        color_scheme += prefix
+		        color_scheme += '_'
+		        color_scheme += words[1]
+		        color_scheme += ':'
+		        color_scheme += words[2]
+	return color_scheme
 
 def build(bld):
 
@@ -966,21 +957,21 @@ def i18n_mo(bld):
                               'Paul Davis')
 
 def appdata_i18n_pot(bld):
-    potfile = os.path.join(bld.top_dir, 'gtk2_ardour', 'appdata',
-            'ardour.appdata.pot')
-    if bld.cmd == 'i18n_pot':
-        Logs.info('Generating pot file from Ardour appdata')
-        itsfile = os.path.join(bld.top_dir, 'tools', 'as-metainfo.its')
-        adsource = os.path.join(bld.top_dir, 'gtk2_ardour',
-                'ardour.appdata.xml.in.in')
-        Logs.info('Updating ' + potfile)
-        try:
-                subprocess.call(('itstool', '-i', itsfile, '-o', potfile, adsource))
-        except:
-                print ('Error processing appdata pot file - ignored')
-    elif bld.cmd == 'clean' and os.path.exists(potfile):
-        Logs.info('Removing Ardour appdata pot file')
-        os.remove(potfile)
+	potfile = os.path.join(bld.top_dir, 'gtk2_ardour', 'appdata',
+	        'ardour.appdata.pot')
+	if bld.cmd == 'i18n_pot':
+		Logs.info('Generating pot file from Ardour appdata')
+		itsfile = os.path.join(bld.top_dir, 'tools', 'as-metainfo.its')
+		adsource = os.path.join(bld.top_dir, 'gtk2_ardour',
+		        'ardour.appdata.xml.in.in')
+		Logs.info(f'Updating {potfile}')
+		try:
+		        subprocess.call(('itstool', '-i', itsfile, '-o', potfile, adsource))
+		except:
+		        print ('Error processing appdata pot file - ignored')
+	elif bld.cmd == 'clean' and os.path.exists(potfile):
+	    Logs.info('Removing Ardour appdata pot file')
+	    os.remove(potfile)
 
 def appdata_i18n_po(bld):
     autowaf.build_i18n_po(bld, bld.top_dir, os.path.join(
@@ -991,17 +982,17 @@ def appdata_i18n_mo(bld):
         'gtk2_ardour', 'appdata'), 'ardour.appdata', 'dummy', 'dummy')
 
 def appdata_i18n_xmlin(bld):
-    adxmlinfile = os.path.join(bld.top_dir, 'gtk2_ardour',
-            'ardour.appdata.xml.in')
-    if bld.cmd == 'build':
-        itsfile = os.path.join(bld.top_dir, 'tools', 'as-metainfo.its')
-        adxmlininfile = os.path.join(bld.top_dir, 'gtk2_ardour',
-                'ardour.appdata.xml.in.in')
-        mo_glob = os.path.join(bld.top_dir, 'gtk2_ardour', 'appdata', 'po', '*.mo')
-        mo_files = glob.glob(mo_glob)
-        Logs.info('Generating ' + adxmlinfile)
-        subprocess.call(['itstool', '-i', itsfile, '-o', adxmlinfile,
-            '-j', adxmlininfile] + mo_files)
-    elif bld.cmd == 'clean' and os.path.exists(adxmlinfile):
-        Logs.info('Removing ' + adxmlinfile)
-        os.remove(adxmlinfile)
+	adxmlinfile = os.path.join(bld.top_dir, 'gtk2_ardour',
+	        'ardour.appdata.xml.in')
+	if bld.cmd == 'build':
+		itsfile = os.path.join(bld.top_dir, 'tools', 'as-metainfo.its')
+		adxmlininfile = os.path.join(bld.top_dir, 'gtk2_ardour',
+		        'ardour.appdata.xml.in.in')
+		mo_glob = os.path.join(bld.top_dir, 'gtk2_ardour', 'appdata', 'po', '*.mo')
+		mo_files = glob.glob(mo_glob)
+		Logs.info(f'Generating {adxmlinfile}')
+		subprocess.call(['itstool', '-i', itsfile, '-o', adxmlinfile,
+		    '-j', adxmlininfile] + mo_files)
+	elif bld.cmd == 'clean' and os.path.exists(adxmlinfile):
+		Logs.info(f'Removing {adxmlinfile}')
+		os.remove(adxmlinfile)

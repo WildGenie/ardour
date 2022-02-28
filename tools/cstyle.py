@@ -43,7 +43,7 @@ class Preprocessor:
 		"""
 		return self.comment_nest
 
-	def __call__ (self, line):
+	def __call__(self, line):
 		"""
 		Strip the provided line of C and C++ comments. Stripping of multi-line
 		C comments works as expected.
@@ -79,17 +79,17 @@ class Preprocessor:
 			# Comment begins and ends on this line. Replace it with 'comment'
 			# so we don't need to check whitespace before and after the comment
 			# we're removing.
-			newline = line [:open_comment] + "comment" + line [close_comment + 2:]
+			newline = f'{line[:open_comment]}comment{line[close_comment + 2:]}'
 			return self.__call__ (newline)
 
 		return line
 
-	def process_strings (self, line):
+	def process_strings(self, line):
 		"""
 		Given a line of C code, return a string where all literal C strings have
 		been replaced with the empty string literal "".
 		"""
-		for k in range (0, len (line)):
+		for k in range(len (line)):
 			if line [k] == '"':
 				start = k
 				for k in range (start + 1, len (line)):
@@ -193,7 +193,7 @@ class CStyleChecker:
 
 		return
 
-	def line_checks (self, line):
+	def line_checks(self, line):
 		"""
 		Run the style checker on provided line of text, but within the context
 		of how the line fits within the file.
@@ -211,17 +211,16 @@ class CStyleChecker:
 		for (check_re, msg) in self.warning_checks:
 			if check_re.search (line):
 				self.warning (msg)
-
                 # Now all the stylistic error regex checks.
 		for (check_re, msg) in self.error_checks:
 			if check_re.search (line):
 				self.error (msg)
 
-                                
-		if re.search ("[a-zA-Z0-9_][<>!=^/&\|]{1,2}[a-zA-Z0-9_]", line):
-                        # ignore #include <foo.h> and C++ templates with indirection/pointer/reference operators
-			if not re.search (".*#include.*[a-zA-Z0-9]/[a-zA-Z]", line) and not re.search ("[a-zA-Z0-9_]>[&\*]*\s", line):
-				self.error ("missing space around operator")
+
+		if (re.search("[a-zA-Z0-9_][<>!=^/&\|]{1,2}[a-zA-Z0-9_]", line)
+		    and not re.search(".*#include.*[a-zA-Z0-9]/[a-zA-Z]", line)
+		    and not re.search("[a-zA-Z0-9_]>[&\*]*\s", line)):
+			self.error ("missing space around operator")
 
 		self.last_line_indent = indent
 		return
@@ -250,7 +249,7 @@ if len (sys.argv) < 1:
 	sys.exit (1)
 
 # Create a new CStyleChecker object
-if sys.argv [1] == '-d' or sys.argv [1] == '--debug':
+if sys.argv[1] in ['-d', '--debug']:
 	cstyle = CStyleChecker (True)
 	cstyle.check_files (sys.argv [2:])
 else:
