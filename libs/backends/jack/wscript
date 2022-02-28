@@ -94,11 +94,7 @@ def build(bld):
         obj.cxxflags += [ '-DHAVE_JACK_PORT_RENAME' ]
         obj.cflags += [ '-DHAVE_JACK_PORT_RENAME' ]
 
-    if (bld.env['build_target'] == 'mingw'):
-        obj.uselib   = [ 'PORTAUDIO' ]
-    else:
-        obj.uselib   = [ ]
-
+    obj.uselib = [ 'PORTAUDIO' ] if (bld.env['build_target'] == 'mingw') else [ ]
     if bld.env['libjack_link'] == 'link':
         obj.uselib   += [ 'JACK' ]
     elif bld.env['build_target'] == 'mingw':

@@ -42,8 +42,7 @@ def set_options(opt, debug_by_default=False):
 
     # Move --prefix and --destdir to directory options group
     for k in ('--prefix', '--destdir'):
-        option = opt.parser.get_option(k)
-        if option:
+        if option := opt.parser.get_option(k):
             opt.parser.remove_option(k)
             dirs_options.add_option(option)
 
@@ -93,10 +92,7 @@ def copyfile (task):
 
 def check_header(conf, lang, name, define='', mandatory=True):
     "Check for a header"
-    includes = '' # search default system include paths
-    if sys.platform == "darwin":
-        includes = '/opt/local/include'
-
+    includes = '/opt/local/include' if sys.platform == "darwin" else ''
     if lang == 'c':
         check_func = conf.check_cc
     elif lang == 'cxx':
@@ -126,11 +122,11 @@ def check_pkg(conf, name, **args):
         OPTIONAL=1
         MANDATORY=2
     var_name = 'CHECKED_' + nameify(args['uselib_store'])
-    check = not var_name in conf.env
-    mandatory = not 'mandatory' in args or args['mandatory']
+    check = var_name not in conf.env
+    mandatory = 'mandatory' not in args or args['mandatory']
     if not check and 'atleast_version' in args:
         # Re-check if version is newer than previous check
-        checked_version = conf.env['VERSION_' + name]
+        checked_version = conf.env[f'VERSION_{name}']
         if checked_version and checked_version < args['atleast_version']:
             check = True;
     if not check and mandatory and conf.env[var_name] == CheckType.OPTIONAL:
@@ -143,19 +139,25 @@ def check_pkg(conf, name, **args):
         if mandatory:
             args['mandatory'] = True  # Unsmash mandatory arg
         if 'atleast_version' in args:
-            if not 'msg' in args:
+            if 'msg' not in args:
                 args['msg'] = 'Checking for %r >= %s' %(pkg_name, args['atleast_version'])
-            found = conf.check_cfg(package=pkg_name, args=[pkg_name + " >= " + args['atleast_version'], '--cflags', '--libs'], **args)
+            found = conf.check_cfg(
+                package=pkg_name,
+                args=[
+                    f'{pkg_name} >= ' + args['atleast_version'],
+                    '--cflags',
+                    '--libs',
+                ],
+                **args,
+            )
+
         else:
             found = conf.check_cfg(package=pkg_name, args="--cflags --libs", **args)
         if found:
             conf.env[pkg_var_name] = pkg_name
         if 'atleast_version' in args:
-            conf.env['VERSION_' + name] = args['atleast_version']
-    if mandatory:
-        conf.env[var_name] = CheckType.MANDATORY
-    else:
-        conf.env[var_name] = CheckType.OPTIONAL
+            conf.env[f'VERSION_{name}'] = args['atleast_version']
+    conf.env[var_name] = CheckType.MANDATORY if mandatory else CheckType.OPTIONAL
 
 
 def normpath(path):
@@ -168,8 +170,6 @@ def ensure_visible_symbols(bld, visible):
     if bld.env['MSVC_COMPILER']:
         if visible:
             print ('*** WARNING: MSVC does not allow symbols to be visible/exported by default while building ' + bld.name)
-        else:
-            pass
     else:
         if not hasattr (bld,'cxxflags'):
             bld.cxxflags = []
@@ -220,10 +220,7 @@ def configure(conf):
     conf.env['PREFIX'] = normpath(os.path.abspath(os.path.expanduser(conf.env['PREFIX'])))
 
     def config_dir(var, opt, default):
-        if opt:
-            conf.env[var] = normpath(opt)
-        else:
-            conf.env[var] = normpath(default)
+        conf.env[var] = normpath(opt) if opt else normpath(default)
 
     opts   = Options.options
     prefix = conf.env['PREFIX']
@@ -256,7 +253,7 @@ def configure(conf):
     g_step = 2
 
 def set_local_lib(conf, name, has_objects):
-    var_name = 'HAVE_' + nameify(name.upper())
+    var_name = f'HAVE_{nameify(name.upper())}'
     define(conf, var_name, 1)
     if has_objects:
         if type(conf.env['AUTOWAF_LOCAL_LIBS']) != dict:
@@ -281,14 +278,14 @@ def use_lib(bld, obj, libs):
         in_libs    = l.lower() in bld.env['AUTOWAF_LOCAL_LIBS']
         if in_libs:
             append_property(obj, 'use', ' lib%s ' % l.lower())
-            append_property(obj, 'framework', bld.env['FRAMEWORK_' + l])
+            append_property(obj, 'framework', bld.env[f'FRAMEWORK_{l}'])
         if in_headers or in_libs:
-            inc_flag = '-iquote ' + os.path.join(abssrcdir, l.lower())
+            inc_flag = f'-iquote {os.path.join(abssrcdir, l.lower())}'
             for f in ['CFLAGS', 'CXXFLAGS']:
-                if not inc_flag in bld.env[f]:
+                if inc_flag not in bld.env[f]:
                     bld.env.prepend_value(f, inc_flag)
         else:
-            append_property(obj, 'uselib', ' ' + l)
+            append_property(obj, 'uselib', f' {l}')
 
 @feature('c', 'cxx')
 @before('apply_link')
@@ -298,7 +295,7 @@ def version_lib(self):
     if self.env['PARDEBUG']:
         applicable = ['cshlib', 'cxxshlib', 'cstlib', 'cxxstlib']
         if [x for x in applicable if x in self.features]:
-            self.target = self.target + 'D'
+            self.target = f'{self.target}D'
 
 def set_lib_env(conf, name, version):
     'Set up environment for local library as if found via pkg-config.'
@@ -309,9 +306,9 @@ def set_lib_env(conf, name, version):
     if conf.env.PARDEBUG:
         lib_name += 'D'
     conf.env[pkg_var_name]       = lib_name
-    conf.env['INCLUDES_' + NAME] = ['${INCLUDEDIR}/%s-%s' % (name, major_ver)]
-    conf.env['LIBPATH_' + NAME]  = [conf.env.LIBDIR]
-    conf.env['LIB_' + NAME]      = [lib_name]
+    conf.env[f'INCLUDES_{NAME}'] = ['${INCLUDEDIR}/%s-%s' % (name, major_ver)]
+    conf.env[f'LIBPATH_{NAME}'] = [conf.env.LIBDIR]
+    conf.env[f'LIB_{NAME}'] = [lib_name]
 
 def display_header(title):
     Logs.pprint('BOLD', title)
@@ -320,7 +317,7 @@ def display_msg(conf, msg, status = None, color = None):
     color = 'CYAN'
     if type(status) == bool and status or status == "True":
         color = 'GREEN'
-    elif type(status) == bool and not status or status == "False":
+    elif type(status) == bool or status == "False":
         color = 'YELLOW'
     Logs.pprint('BOLD', " *", sep='')
     Logs.pprint('NORMAL', "%s" % msg.ljust(conf.line_just - 3), sep='')
@@ -328,7 +325,7 @@ def display_msg(conf, msg, status = None, color = None):
     Logs.pprint(color, status)
 
 def link_flags(env, lib):
-    return ' '.join(map(lambda x: env['LIB_ST'] % x, env['LIB_' + lib]))
+    return ' '.join(map(lambda x: env['LIB_ST'] % x, env[f'LIB_{lib}']))
 
 def compile_flags(env, lib):
     return ' '.join(map(lambda x: env['CPPPATH_ST'] % x, env['INCLUDES_' + lib]))
@@ -355,7 +352,7 @@ def build_pc(bld, name, version, version_suffix, libs, subst_dict={}):
 
     target = name.lower()
     if version_suffix != '':
-        target += '-' + version_suffix
+        target += f'-{version_suffix}'
 
     if bld.env['PARDEBUG']:
         target += 'D'
@@ -383,14 +380,14 @@ def build_pc(bld, name, version, version_suffix, libs, subst_dict={}):
     if type(libs) != list:
         libs = libs.split()
 
-    subst_dict[name + '_VERSION'] = version
-    subst_dict[name + '_MAJOR_VERSION'] = version[0:version.find('.')]
+    subst_dict[f'{name}_VERSION'] = version
+    subst_dict[f'{name}_MAJOR_VERSION'] = version[:version.find('.')]
     for i in libs:
-        subst_dict[i + '_LIBS']   = link_flags(bld.env, i)
+        subst_dict[f'{i}_LIBS'] = link_flags(bld.env, i)
         lib_cflags = compile_flags(bld.env, i)
         if lib_cflags == '':
             lib_cflags = ' '
-        subst_dict[i + '_CFLAGS'] = lib_cflags
+        subst_dict[f'{i}_CFLAGS'] = lib_cflags
 
     obj.__dict__.update(subst_dict)
 
@@ -427,7 +424,7 @@ def make_simple_dox(name):
                   glob.glob('*.html') +
                   glob.glob('*.js') +
                   glob.glob('*.css')):
-            if i != 'index.html' and i != 'style.css':
+            if i not in ['index.html', 'style.css']:
                 os.remove(i)
         os.chdir(top)
         os.chdir(build_dir(name, 'doc/man/man3'))
@@ -458,10 +455,11 @@ def build_dox(bld, name, version, srcdir, blddir, outdir=''):
                    name         = 'doxyfile')
 
     subst_dict = {
-        name + '_VERSION' : version,
-        name + '_SRCDIR'  : os.path.abspath(src_dir),
-        name + '_DOC_DIR' : os.path.abspath(doc_dir)
-        }
+        f'{name}_VERSION': version,
+        f'{name}_SRCDIR': os.path.abspath(src_dir),
+        f'{name}_DOC_DIR': os.path.abspath(doc_dir),
+    }
+
 
     subst_tg.__dict__.update(subst_dict)
 
@@ -472,7 +470,7 @@ def build_dox(bld, name, version, srcdir, blddir, outdir=''):
 
     docs.post()
 
-    major = int(version[0:version.find('.')])
+    major = int(version[:version.find('.')])
     bld.install_files(
         os.path.join('${DOCDIR}', '%s-%d' % (name.lower(), major), outdir, 'html'),
         bld.path.get_bld().ant_glob('doc/html/*'))
@@ -485,30 +483,28 @@ def build_dox(bld, name, version, srcdir, blddir, outdir=''):
 def build_version_files(header_path, source_path, domain, major, minor, micro, exportname, visheader):
     header_path = os.path.abspath(header_path)
     source_path = os.path.abspath(source_path)
-    text  = "int " + domain + "_major_version = " + str(major) + ";\n"
-    text += "int " + domain + "_minor_version = " + str(minor) + ";\n"
-    text += "int " + domain + "_micro_version = " + str(micro) + ";\n"
+    text = f"int {domain}_major_version = {str(major)}" + ";\n"
+    text += f"int {domain}_minor_version = {str(minor)}" + ";\n"
+    text += f"int {domain}_micro_version = {str(micro)}" + ";\n"
     try:
-        o = open(source_path, 'w')
-        o.write(text)
-        o.close()
+        with open(source_path, 'w') as o:
+            o.write(text)
     except IOError:
         Logs.error('Failed to open %s for writing\n' % source_path)
         sys.exit(-1)
 
-    text  = "#ifndef __" + domain + "_version_h__\n"
-    text += "#define __" + domain + "_version_h__\n"
+    text = f"#ifndef __{domain}" + "_version_h__\n"
+    text += f"#define __{domain}" + "_version_h__\n"
     if visheader != '':
         text += "#include \"" + visheader + "\"\n"
-    text += exportname + " extern const char* " + domain + "_revision;\n"
-    text += exportname + " extern int " + domain + "_major_version;\n"
-    text += exportname + " extern int " + domain + "_minor_version;\n"
-    text += exportname + " extern int " + domain + "_micro_version;\n"
-    text += "#endif /* __" + domain + "_version_h__ */\n"
+    text += f'{exportname} extern const char* {domain}' + "_revision;\n"
+    text += f'{exportname} extern int {domain}' + "_major_version;\n"
+    text += f'{exportname} extern int {domain}' + "_minor_version;\n"
+    text += f'{exportname} extern int {domain}' + "_micro_version;\n"
+    text += f"#endif /* __{domain}" + "_version_h__ */\n"
     try:
-        o = open(header_path, 'w')
-        o.write(text)
-        o.close()
+        with open(header_path, 'w') as o:
+            o.write(text)
     except IOError:
         Logs.warn('Failed to open %s for writing\n' % header_path)
         sys.exit(-1)
@@ -532,7 +528,7 @@ def build_i18n_pot(bld, srcdir, dir, name, sources, copyright_holder=None):
         cmd += ['--copyright-holder="%s"' % copyright_holder]
 
     cmd += sources
-    Logs.info('Updating ' + pot_file)
+    Logs.info(f'Updating {pot_file}')
     subprocess.call(cmd, cwd=os.path.join(srcdir, dir))
 
 def build_i18n_po(bld, srcdir, dir, name, sources, copyright_holder=None):
@@ -546,7 +542,7 @@ def build_i18n_po(bld, srcdir, dir, name, sources, copyright_holder=None):
                '--no-fuzzy-matching',
                po_file,
                pot_file]
-        Logs.info('Updating ' + po_file)
+        Logs.info(f'Updating {po_file}')
         subprocess.call(cmd)
     os.chdir(pwd)
 
@@ -563,7 +559,7 @@ def build_i18n_mo(bld, srcdir, dir, name, sources, copyright_holder=None):
                '-o',
                mo_file,
                po_file]
-        Logs.info('Generating ' + po_file)
+        Logs.info(f'Generating {po_file}')
         subprocess.call(cmd)
     os.chdir(pwd)
 
@@ -588,51 +584,42 @@ def cd_to_orig_dir(ctx, child):
         os.chdir('..')
 
 def pre_test(ctx, appname, dirs=['src']):
-    diropts  = ''
-    for i in dirs:
-        diropts += ' -d ' + i
+    diropts = ''.join(f' -d {i}' for i in dirs)
     cd_to_build_dir(ctx, appname)
     clear_log = open('lcov-clear.log', 'w')
     try:
-        try:
-            # Clear coverage data
-            subprocess.call(('lcov %s -z' % diropts).split(),
-                            stdout=clear_log, stderr=clear_log)
-        except:
-            Logs.warn('Failed to run lcov, no coverage report will be generated')
+        # Clear coverage data
+        subprocess.call(('lcov %s -z' % diropts).split(),
+                        stdout=clear_log, stderr=clear_log)
+    except:
+        Logs.warn('Failed to run lcov, no coverage report will be generated')
     finally:
         clear_log.close()
 
 def post_test(ctx, appname, dirs=['src'], remove=['*boost*', 'c++*']):
-    diropts  = ''
-    for i in dirs:
-        diropts += ' -d ' + i
+    diropts = ''.join(f' -d {i}' for i in dirs)
     coverage_log           = open('lcov-coverage.log', 'w')
     coverage_lcov          = open('coverage.lcov', 'w')
     coverage_stripped_lcov = open('coverage-stripped.lcov', 'w')
     try:
-        try:
-            base = '.'
-            if g_is_child:
-                base = '..'
+        base = '..' if g_is_child else '.'
+        # Generate coverage data
+        subprocess.call(('lcov -c %s -b %s' % (diropts, base)).split(),
+                        stdout=coverage_lcov, stderr=coverage_log)
 
-            # Generate coverage data
-            subprocess.call(('lcov -c %s -b %s' % (diropts, base)).split(),
-                            stdout=coverage_lcov, stderr=coverage_log)
+        # Strip unwanted stuff
+        subprocess.call(
+            ['lcov', '--remove', 'coverage.lcov'] + remove,
+            stdout=coverage_stripped_lcov, stderr=coverage_log)
 
-            # Strip unwanted stuff
-            subprocess.call(
-                ['lcov', '--remove', 'coverage.lcov'] + remove,
-                stdout=coverage_stripped_lcov, stderr=coverage_log)
+        # Generate HTML coverage output
+        if not os.path.isdir('coverage'):
+            os.makedirs('coverage')
+        subprocess.call('genhtml -o coverage coverage-stripped.lcov'.split(),
+                        stdout=coverage_log, stderr=coverage_log)
 
-            # Generate HTML coverage output
-            if not os.path.isdir('coverage'):
-                os.makedirs('coverage')
-            subprocess.call('genhtml -o coverage coverage-stripped.lcov'.split(),
-                            stdout=coverage_log, stderr=coverage_log)
-
-        except:
-            Logs.warn('Failed to run lcov, no coverage report will be generated')
+    except:
+        Logs.warn('Failed to run lcov, no coverage report will be generated')
     finally:
         coverage_stripped_lcov.close()
         coverage_lcov.close()
@@ -640,8 +627,7 @@ def post_test(ctx, appname, dirs=['src'], remove=['*boost*', 'c++*']):
 
         print('')
         Logs.pprint('GREEN', "Waf: Leaving directory `%s'" % os.path.abspath(os.getcwd()))
-        top_level = (len(ctx.stack_path) > 1)
-        if top_level:
+        if top_level := (len(ctx.stack_path) > 1):
             cd_to_orig_dir(ctx, top_level)
 
     print('')
@@ -650,10 +636,7 @@ def post_test(ctx, appname, dirs=['src'], remove=['*boost*', 'c++*']):
 
 def run_tests(ctx, appname, tests, desired_status=0, dirs=['src'], name='*'):
     failures = 0
-    diropts  = ''
-    for i in dirs:
-        diropts += ' -d ' + i
-
+    diropts = ''.join(f' -d {i}' for i in dirs)
     # Run all tests
     for i in tests:
         s = i
@@ -664,7 +647,7 @@ def run_tests(ctx, appname, tests, desired_status=0, dirs=['src'], name='*'):
         Logs.pprint('NORMAL', '%s' % s)
         cmd = i
         if Options.options.grind:
-            cmd = 'valgrind ' + i
+            cmd = f'valgrind {i}'
         if subprocess.call(cmd, shell=True) == desired_status:
             Logs.pprint('GREEN', '** Pass')
         else:

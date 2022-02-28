@@ -132,14 +132,12 @@ def find_lib():
 	src = os.path.abspath(inspect.getfile(inspect.getmodule(err)))
 	base, name = os.path.split(src)
 
-	#devs use $WAFDIR
-	w=test(os.environ.get('WAFDIR', ''))
-	if w: return w
-
+	if w := test(os.environ.get('WAFDIR', '')):
+		return w
 	#waf-light
 	if name.endswith('waf-light'):
-		w = test(base)
-		if w: return w
+		if w := test(base):
+			return w
 		for dir in sys.path:
 			if test(dir):
 				return dir
@@ -147,14 +145,12 @@ def find_lib():
 
 	dirname = '%s-%s-%s' % (WAF, VERSION, REVISION)
 	for i in (INSTALL,'/usr','/usr/local','/opt'):
-		w = test(i + '/lib/' + dirname)
-		if w: return w
-
+		if w := test(f'{i}/lib/{dirname}'):
+			return w
 	#waf-local
 	dir = join(base, (sys.platform != 'win32' and '.' or '') + dirname)
-	w = test(dir)
-	if w: return w
-
+	if w := test(dir):
+		return w
 	#unpack
 	unpack_wafdir(dir, src)
 	return dir

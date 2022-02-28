@@ -17,7 +17,7 @@ def options(opt):
     autowaf.set_options(opt)
 
 def configure(conf):
-    if not "dummy" in conf.env['BACKENDS']:
+    if "dummy" not in conf.env['BACKENDS']:
         print ('session-utils depend on the dummy backend.')
         autowaf.display_msg(conf, 'build session-utils', 'no')
         return
@@ -34,8 +34,8 @@ def build_ardour_util(bld, util):
     obj = bld (features = 'cxx c cxxprogram')
     # this program does not do the whole hidden symbols thing
     obj.cxxflags = [ '-fvisibility=default' ]
-    obj.source   = ['common.cc', util + '.cc' ]
-    obj.target   = pgmprefix + '-' + util
+    obj.source = ['common.cc', f'{util}.cc']
+    obj.target = f'{pgmprefix}-{util}'
     obj.includes = ['.']
     obj.use      = [ 'libpbd',
                      'libardour',
@@ -45,15 +45,21 @@ def build_ardour_util(bld, util):
                      ]
     obj.defines = [
         'VERSIONSTRING="' + str(bld.env['VERSION']) + '"',
-        'UTILNAME="'   + str(pgmprefix + '-' + util) + '"',
-        'DATA_DIR="'   + os.path.normpath(bld.env['DATADIR']) + '"',
+        'UTILNAME="' + str(f'{pgmprefix}-{util}') + '"',
+        'DATA_DIR="' + os.path.normpath(bld.env['DATADIR']) + '"',
         'CONFIG_DIR="' + os.path.normpath(bld.env['SYSCONFDIR']) + '"',
-        'LOCALEDIR="'  + os.path.join(os.path.normpath(bld.env['DATADIR']), 'locale') + '"',
-        'PACKAGE="'    + "ARDOURUTILS" + '"',
-        ]
+        'LOCALEDIR="'
+        + os.path.join(os.path.normpath(bld.env['DATADIR']), 'locale')
+        + '"',
+        'PACKAGE="' + "ARDOURUTILS" + '"',
+    ]
+
     obj.install_path = bld.env['LIBDIR'] + '/utils'
-    obj.uselib       = 'UUID FLAC FONTCONFIG GLIBMM GIOMM GTHREAD OGG CURL DL XML'
-    obj.uselib       += ' AUDIOUNITS OSX LO '
+    obj.uselib = (
+        'UUID FLAC FONTCONFIG GLIBMM GIOMM GTHREAD OGG CURL DL XML'
+        + ' AUDIOUNITS OSX LO '
+    )
+
     obj.uselib       += ' FFTW3F LO TAGLIB LILV RUBBERBAND AUBIO LRDF ARCHIVE VAMPSDK VAMPHOSTSDK'
 
     if bld.is_defined('HAVE_SUIL'):
@@ -74,7 +80,7 @@ def build_ardour_util(bld, util):
 def build(bld):
     VERSION = "%s.%s" % (bld.env['MAJOR'], bld.env['MINOR'])
     # session-utils depend on the dummy backend
-    if not "dummy" in bld.env['BACKENDS']:
+    if "dummy" not in bld.env['BACKENDS']:
         return
 
     pgmprefix = bld.env['PROGRAM_NAME'].lower() + str(bld.env['MAJOR'])

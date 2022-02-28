@@ -175,18 +175,18 @@ def fetch_git_revision_date ():
     return rev, date
 
 def fetch_tarball_revision_date():
-    if not os.path.exists ('libs/ardour/revision.cc'):
-        print ('This tarball was not created correctly - it is missing libs/ardour/revision.cc')
-        sys.exit (1)
-    with open('libs/ardour/revision.cc', 'rb') as f:
-        content = f.readlines()
-        remove_punctuation_map = dict((ord(char), None) for char in '";')
+        if not os.path.exists ('libs/ardour/revision.cc'):
+            print ('This tarball was not created correctly - it is missing libs/ardour/revision.cc')
+            sys.exit (1)
+        with open('libs/ardour/revision.cc', 'rb') as f:
+                content = f.readlines()
+                remove_punctuation_map = {ord(char): None for char in '";'}
 
-        raw_line_tokens = content[1].decode('utf-8').strip().split(' ')
-        rev = raw_line_tokens[7].translate(remove_punctuation_map)
-        date = raw_line_tokens[12].translate(remove_punctuation_map)
+                raw_line_tokens = content[1].decode('utf-8').strip().split(' ')
+                rev = raw_line_tokens[7].translate(remove_punctuation_map)
+                date = raw_line_tokens[12].translate(remove_punctuation_map)
 
-        return rev, date
+                return rev, date
 
 if os.path.isdir (os.path.join(os.getcwd(), '.git')):
     rev, rev_date = fetch_git_revision_date()
@@ -202,11 +202,7 @@ parts = rev.split ('.', 1)
 MAJOR = parts[0]
 other = parts[1].split('-', 1)
 MINOR = other[0]
-if len(other) > 1:
-    MICRO = other[1].rsplit('-',1)[0].replace('-','.')
-else:
-    MICRO = '0'
-
+MICRO = other[1].rsplit('-',1)[0].replace('-','.') if len(other) > 1 else '0'
 V = MAJOR + '.' + MINOR + '.' + MICRO
 
 def sanitize(s):
@@ -233,7 +229,7 @@ PROGRAM_VERSION = sanitize(MAJOR)
 del sanitize
 
 if any(arg in ('dist', 'distcheck') for arg in sys.argv[1:]):
-        if not 'APPNAME' in os.environ:
+        if 'APPNAME' not in os.environ:
                 print ("You must define APPNAME in the environment when running ./waf dist/distcheck")
                 sys.exit (1)
         APPNAME = os.environ['APPNAME'];
@@ -302,49 +298,47 @@ i18n_children = [
 
 # Version stuff
 
-def fetch_gcc_version (CC):
-    cmd = "%s --version" % CC
-    output = subprocess.Popen(cmd, shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE).communicate()[0].splitlines()
-    o = output[0].decode('utf-8')
-    version = o.split(' ')[2].split('.')
-    return version
+def fetch_gcc_version(CC):
+        cmd = "%s --version" % CC
+        output = subprocess.Popen(cmd, shell=True, stderr=subprocess.STDOUT, stdout=subprocess.PIPE).communicate()[0].splitlines()
+        o = output[0].decode('utf-8')
+        return o.split(' ')[2].split('.')
 
 def create_stored_revision():
-    rev = ""
-    if os.path.exists('.git'):
-        rev, rev_date = fetch_git_revision_date();
-        print("Git version: " + rev + "\n")
-    elif os.path.exists('libs/ardour/revision.cc'):
-        print("Using packaged revision")
-        return
-    else:
-        print("Missing libs/ardour/revision.cc.  Blame the packager.")
-        sys.exit(-1)
+        rev = ""
+        if os.path.exists('.git'):
+                rev, rev_date = fetch_git_revision_date();
+                print(f"Git version: {rev}" + "\n")
+        elif os.path.exists('libs/ardour/revision.cc'):
+            print("Using packaged revision")
+            return
+        else:
+                print("Missing libs/ardour/revision.cc.  Blame the packager.")
+                sys.exit(-1)
 
-    try:
-        #
-        # if you change the format of this, be sure to fix fetch_tarball_revision_date()
-        # above so that  it still works.
-        #
-        text =  '#include "ardour/revision.h"\n'
-        text += (
-            'namespace ARDOUR { const char* revision = \"%s\"; '
-            'const char* date = \"%s\"; }\n'
-        ) % (rev, rev_date)
-        print('Writing revision info to libs/ardour/revision.cc using ' + rev + ', ' + rev_date)
-        o = open('libs/ardour/revision.cc', 'w')
-        o.write(text)
-        o.close()
-    except IOError:
-        print('Could not open libs/ardour/revision.cc for writing\n')
-        sys.exit(-1)
+        try:
+                #
+                # if you change the format of this, be sure to fix fetch_tarball_revision_date()
+                # above so that  it still works.
+                #
+                text =  '#include "ardour/revision.h"\n'
+                text += (
+                    'namespace ARDOUR { const char* revision = \"%s\"; '
+                    'const char* date = \"%s\"; }\n'
+                ) % (rev, rev_date)
+                print('Writing revision info to libs/ardour/revision.cc using ' + rev + ', ' + rev_date)
+                with open('libs/ardour/revision.cc', 'w') as o:
+                        o.write(text)
+        except IOError:
+            print('Could not open libs/ardour/revision.cc for writing\n')
+            sys.exit(-1)
 
 def get_depstack_rev(depstack_root):
-    try:
-        with open(depstack_root + '/../.vers', 'r') as f:
-            return f.readline().decode('utf-8').strip()[:7]
-    except IOError:
-        return '-unknown-';
+        try:
+                with open(f'{depstack_root}/../.vers', 'r') as f:
+                        return f.readline().decode('utf-8').strip()[:7]
+        except IOError:
+            return '-unknown-';
 
 def set_compiler_flags (conf,opt):
     #
